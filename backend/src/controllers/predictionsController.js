@@ -56,26 +56,19 @@ function logToWearablePayload(log) {
 }
 
 /**
- * Maps a manual symptom_log document onto the ML ManualLog schema. The ML
- * service requires all five fields, so this returns null if any are missing
- * (e.g. an incomplete log) - the caller then falls back to profile_only.
+ * Maps a manual symptom_log document onto the ML ManualLog schema.
+ * Only pain_score is required (it's a slider so always present). Other
+ * fields default to neutral values when absent so partial logs still
+ * contribute to the daily modifier instead of falling back to profile_only.
  */
 function logToManualPayload(log) {
-  if (
-    log.pain_score == null ||
-    log.sleep_quality == null ||
-    log.hydration_ok == null ||
-    log.mood == null ||
-    log.activity_level == null
-  ) {
-    return null;
-  }
+  if (log.pain_score == null) return null;
   return {
     pain_today: log.pain_score,
-    sleep_quality: log.sleep_quality,
-    hydration_ok: log.hydration_ok,
-    mood: log.mood,
-    activity_level: log.activity_level,
+    sleep_quality: log.sleep_quality ?? 1,   // default: OK
+    hydration_ok: log.hydration_ok ?? false, // default: assume not hydrated (conservative)
+    mood: log.mood ?? 1,                     // default: OK
+    activity_level: log.activity_level ?? 1, // default: OK
   };
 }
 

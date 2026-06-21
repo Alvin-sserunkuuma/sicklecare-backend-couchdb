@@ -141,6 +141,23 @@ async function login(req, res, next) {
 
     const user = { id: userDoc._id, email: userDoc.email, role: userDoc.role };
 
+    // Activate any pending caregiver links on login too, not just on
+    // registration - handles the case where the patient sent the invite after
+    // the caregiver already had an account.
+    if (userDoc.role === "caregiver") {
+      const pending = await db.caregiverLinks.find({
+        selector: { caregiver_email: userId, status: "pending" },
+        limit: 1000,
+      });
+      const acceptedAt = new Date().toISOString();
+      for (const link of pending.docs) {
+        link.caregiver_user_id = userId;
+        link.status = "active";
+        link.accepted_at = acceptedAt;
+        await db.caregiverLinks.insert(link);
+      }
+    }
+
     let patient = null;
     const found = await db.patients.find({ selector: { user_id: userDoc._id }, limit: 1 });
     if (found.docs.length > 0) {

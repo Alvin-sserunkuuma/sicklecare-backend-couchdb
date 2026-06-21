@@ -62,10 +62,10 @@ class WearableReading(BaseModel):
 
 class ManualLog(BaseModel):
     pain_today: int = Field(..., ge=0, le=10)
-    sleep_quality: int = Field(..., ge=0, le=2)
-    hydration_ok: bool
-    mood: int = Field(..., ge=0, le=2)
-    activity_level: int = Field(..., ge=0, le=2)
+    sleep_quality: int = Field(1, ge=0, le=2)   # default: OK
+    hydration_ok: bool = False                    # default: conservative (assume not hydrated)
+    mood: int = Field(1, ge=0, le=2)             # default: OK
+    activity_level: int = Field(1, ge=0, le=2)   # default: OK
 
 
 class PredictionRequest(BaseModel):
