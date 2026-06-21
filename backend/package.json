@@ -1,0 +1,32 @@
+{
+  "name": "sicklecare-backend-couchdb",
+  "version": "1.0.0",
+  "description": "SickleCare REST API server (Express) backed by CouchDB - alternate implementation for comparison against the Postgres version (sicklecare-backend)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "setup": "node src/db/setup.js",
+    "couchdb:mock": "node test/mock-couchdb-server.js",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "axios": "^1.7.4",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nano": "^10.1.4",
+    "pouchdb": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
+  }
+}

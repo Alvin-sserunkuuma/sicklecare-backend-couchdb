@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  couchdb:
+    image: couchdb:3.3
+    container_name: sicklecare-couchdb
+    restart: unless-stopped
+    environment:
+      COUCHDB_USER: sicklecare
+      COUCHDB_PASSWORD: sicklecare
+    ports:
+      - "5984:5984"
+    volumes:
+      - sicklecare_couchdata:/opt/couchdb/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://sicklecare:sicklecare@localhost:5984/_up || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ml-service:
+    build: ./ml-service
+    container_name: sicklecare-couchdb-ml-service
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./ml-service:/app
+
+  backend:
+    build: ./backend
+    container_name: sicklecare-couchdb-backend
+    restart: unless-stopped
+    depends_on:
+      couchdb:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+    environment:
+      COUCHDB_URL: http://sicklecare:sicklecare@couchdb:5984
+      COUCHDB_DB_PREFIX: sicklecare_
+      ML_SERVICE_URL: http://ml-service:8000
+      JWT_SECRET: change-this-to-a-long-random-string
+      JWT_EXPIRES_IN: 7d
+      PORT: 4001
+      NODE_ENV: production
+    ports:
+      - "4001:4001"
+    command: sh -c "node src/db/setup.js && node src/server.js"
+
+volumes:
+  sicklecare_couchdata:
