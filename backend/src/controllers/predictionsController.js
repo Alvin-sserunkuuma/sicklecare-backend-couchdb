@@ -159,16 +159,20 @@ async function create(req, res, next) {
       log_id: resolvedLogId,
       baseline_risk: result.risk_class,
       class_proba: result.class_proba,
+      baseline_annual_rate: result.baseline_annual_rate,
       daily_modifier: result.daily_modifier,
       voc_probability_30d: result.voc_probability_30d,
       data_source: result.data_source,
-      recommendations: result.advice,
+      advice: result.advice,
+      explanation: result.explanation,
+      reasons: Array.isArray(result.reasons) ? result.reasons : [],
+      recommendations: Array.isArray(result.tips) ? result.tips : [],
       created_at: new Date().toISOString(),
     };
     const inserted = await db.riskAssessments.insert(doc);
     doc._rev = inserted.rev;
 
-    res.status(201).json({ ...toApi(doc), baseline_annual_rate: result.baseline_annual_rate });
+    res.status(201).json(toApi(doc));
   } catch (err) {
     next(err);
   }

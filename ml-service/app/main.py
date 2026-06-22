@@ -15,7 +15,7 @@ import os
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
 
 from .predict import VOCModel, MODELS_DIR
 
@@ -82,6 +82,9 @@ class PredictionResponse(BaseModel):
     voc_probability_30d: float
     data_source: str
     advice: str
+    explanation: str
+    reasons: List[str]
+    tips: List[str]
 
 
 @app.get("/health")
